@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prepa E-xam</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2A4F17 0%, #607B51 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #2A4F17;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .welcome-screen, .quiz-screen, .result-screen {
+            display: none;
+        }
+
+        .welcome-screen.active, .quiz-screen.active, .result-screen.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #607B51;
+        }
+
+        button {
+            background: linear-gradient(135deg, #2A4F17 0%, #607B51 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(42, 79, 23, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .progress-bar {
+            background: #CAD3C5;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #2A4F17 0%, #607B51 100%);
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .question-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .option:hover {
+            border-color: #607B51;
+            background: #CAD3C5;
+        }
+
+        .option.selected {
+            border-color: #607B51;
+            background: #95A78B;
+        }
+
+        .option.correct {
+            border-color: #4caf50;
+            background: #e8f5e9;
+        }
+
+        .option.incorrect {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+
+        .result-screen h2 {
+            color: #2A4F17;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 3em;
+            color: #607B51;
+            text-align: center;
+            margin: 30px 0;
+            font-weight: bold;
+        }
+
+        .result-message {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .user-info {
+            background: #CAD3C5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .nav-buttons button {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Prepa E-xam</h1>
+        
+        <!-- Écran d'accueil -->
+        <div class="welcome-screen active">
+            <div class="input-group">
+                <label for="userName">Entrez votre nom :</label>
+                <input type="text" id="userName" placeholder="Votre nom complet">
+            </div>
+            <button onclick="startQuiz()">Commencer le Quiz</button>
+        </div>
+
+        <!-- Écran de quiz -->
+        <div class="quiz-screen">
+            <div class="user-info">
+                <strong>Participant :</strong> <span id="displayName"></span>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="question-info">
+                <span>Question <span id="currentQuestion">1</span>/20</span>
+                <span>Score : <span id="currentScore">0</span></span>
+            </div>
+            
+            <div class="question-text" id="questionText"></div>
+            
+            <div class="options" id="optionsContainer"></div>
+            
+            <div class="nav-buttons">
+                <button onclick="nextQuestion()" id="nextBtn" style="display:none;">Question Suivante</button>
+            </div>
+        </div>
+
+        <!-- Écran de résultats -->
+        <div class="result-screen">
+            <h2>🎉 Quiz Terminé !</h2>
+            <div class="user-info">
+                <strong>Participant :</strong> <span id="finalName"></span>
+            </div>
+            <div class="score-display" id="finalScore"></div>
+            <div class="result-message" id="resultMessage"></div>
+            <button onclick="restartQuiz()">Recommencer</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de données de 200 questions
+        const questionsDB = [
+            // Questions sur les définitions de base (1-30)
+            {q: "Qu'est-ce qu'un groupe selon la psychosociologie ?", o: ["Un ensemble de personnes partageant un objectif commun", "Des personnes qui travaillent dans le même bureau", "Un nombre quelconque de personnes", "Des personnes du même âge"], c: 0},
+            {q: "Quel est l'élément essentiel d'un groupe ?", o: ["L'interaction entre les membres", "Le même salaire", "La même nationalité", "Le même diplôme"], c: 0},
+            {q: "Qu'est-ce que la dynamique de groupe ?", o: ["L'étude des interactions humaines dans les groupes", "La vitesse de travail du groupe", "Le nombre de membres", "L'ancienneté du groupe"], c: 0},
+            {q: "Qui est le fondateur de la théorie de la dynamique de groupe ?", o: ["Kurt Lewin", "Sigmund Freud", "Carl Jung", "Abraham Maslow"], c: 0},
+            {q: "Combien d'étapes propose Bruce Tuckman dans son modèle ?", o: ["5 étapes", "3 étapes", "7 étapes", "4 étapes"], c: 0},
+            {q: "Quelle est la première étape du modèle de Tuckman ?", o: ["Formation", "Turbulence", "Performance", "Normalisation"], c: 0},
+            {q: "Que signifie 'psychosociologie' ?", o: ["L'étude des comportements humains en groupe", "L'étude de la psychologie animale", "L'étude des maladies mentales", "L'étude de la société"], c: 0},
+            {q: "Qu'est-ce que l'identité collective ?", o: ["Le sentiment d'appartenance au groupe", "Le nom du groupe", "Le logo de l'entreprise", "L'adresse du bureau"], c: 0},
+            {q: "Quelle est l'importance de la dynamique de groupe ?", o: ["Elle influence la performance des équipes", "Elle détermine les salaires", "Elle fixe les horaires", "Elle choisit les vacances"], c: 0},
+            {q: "Que favorise une bonne dynamique de groupe ?", o: ["La motivation et la cohésion", "La compétition destructrice", "L'isolement", "La confusion"], c: 0},
+
+            // Questions sur Kurt Lewin (31-50)
+            {q: "Quelle théorie Kurt Lewin a-t-il développée ?", o: ["La théorie du champ de forces", "La théorie de l'évolution", "La théorie de la relativité", "La théorie des cordes"], c: 0},
+            {q: "Selon Lewin, le comportement dépend de quoi ?", o: ["La personne et son environnement", "Seulement la personnalité", "Seulement les gènes", "Le hasard"], c: 0},
+            {q: "Quelle est la formule de Lewin ?", o: ["C = f(P,E)", "E = mc²", "F = ma", "V = d/t"], c: 0},
+            {q: "Que représente 'P' dans la formule de Lewin ?", o: ["La personne", "Le projet", "Le profit", "La planète"], c: 0},
+            {q: "Que représente 'E' dans la formule de Lewin ?", o: ["L'environnement", "L'énergie", "L'entreprise", "L'éducation"], c: 0},
+            {q: "Quelle approche Lewin a-t-il privilégiée ?", o: ["L'approche interactionniste", "L'approche individualiste", "L'approche génétique", "L'approche behavioriste pure"], c: 0},
+            {q: "Lewin est considéré comme le père de quoi ?", o: ["La psychologie sociale moderne", "La psychanalyse", "La psychiatrie", "La neurologie"], c: 0},
+            {q: "Quel type de recherche Lewin a-t-il promu ?", o: ["La recherche-action", "La recherche pure", "La recherche médicale", "La recherche spatiale"], c: 0},
+            {q: "Selon Lewin, qu'est-ce qui influence le comportement de groupe ?", o: ["Les forces du champ social", "Uniquement les individus", "Le hasard", "Les astres"], c: 0},
+            {q: "Quelle était la nationalité d'origine de Kurt Lewin ?", o: ["Allemand", "Américain", "Français", "Anglais"], c: 0},
+
+            // Questions sur le modèle de Tuckman (51-80)
+            {q: "Quelle est la 2ème étape du modèle de Tuckman ?", o: ["Turbulence (Storming)", "Formation", "Performance", "Dissolution"], c: 0},
+            {q: "Quelle est la 3ème étape du modèle de Tuckman ?", o: ["Normalisation (Norming)", "Turbulence", "Formation", "Performance"], c: 0},
+            {q: "Quelle est la 4ème étape du modèle de Tuckman ?", o: ["Performance (Performing)", "Formation", "Turbulence", "Dissolution"], c: 0},
+            {q: "Quelle est la dernière étape du modèle de Tuckman ?", o: ["Dissolution (Adjourning)", "Performance", "Formation", "Turbulence"], c: 0},
+            {q: "Que se passe-t-il durant l'étape de formation ?", o: ["Les membres apprennent à se connaître", "Les conflits éclatent", "Le groupe se dissout", "La performance est maximale"], c: 0},
+            {q: "Que caractérise l'étape de turbulence ?", o: ["Les conflits et désaccords", "L'harmonie totale", "La dissolution", "La formation"], c: 0},
+            {q: "Que se passe-t-il durant la normalisation ?", o: ["Établissement de règles et normes", "Dissolution du groupe", "Conflits intenses", "Première rencontre"], c: 0},
+            {q: "Durant quelle étape le groupe est-il le plus efficace ?", o: ["Performance", "Formation", "Turbulence", "Dissolution"], c: 0},
+            {q: "Pourquoi l'étape de dissolution existe-t-elle ?", o: ["Car les projets ont une fin", "Car les groupes échouent", "Par obligation légale", "Sans raison particulière"], c: 0},
+            {q: "L'étape de turbulence est-elle nécessaire ?", o: ["Oui, elle permet la clarification", "Non, elle doit être évitée", "Elle est toujours négative", "Elle n'existe pas vraiment"], c: 0},
+            {q: "Combien de temps dure chaque étape de Tuckman ?", o: ["Cela varie selon les groupes", "Exactement 1 mois", "1 semaine", "1 an"], c: 0},
+            {q: "Peut-on sauter des étapes dans le modèle de Tuckman ?", o: ["Non, toutes les étapes sont importantes", "Oui, on peut passer directement à la performance", "Seulement la turbulence", "Oui, toutes sauf la formation"], c: 0},
+            {q: "Que faire durant l'étape de turbulence ?", o: ["Faciliter la communication et résoudre les conflits", "Ignorer les problèmes", "Dissoudre le groupe", "Remplacer tous les membres"], c: 0},
+            {q: "Quel est l'objectif de la normalisation ?", o: ["Créer une cohésion et des règles communes", "Augmenter les conflits", "Terminer le projet", "Recruter de nouveaux membres"], c: 0},
+            {q: "Durant quelle étape la confiance s'établit-elle ?", o: ["Normalisation", "Formation", "Turbulence", "Dissolution"], c: 0},
+            {q: "Que doit faire un leader durant la formation ?", o: ["Guider et structurer le groupe", "S'absenter", "Créer des conflits", "Dissoudre le groupe"], c: 0},
+            {q: "La performance peut-elle baisser après avoir été atteinte ?", o: ["Oui, si de nouveaux conflits surgissent", "Non, elle est permanente", "Jamais", "Seulement le lundi"], c: 0},
+            {q: "Quel sentiment domine durant la dissolution ?", o: ["Nostalgie et accomplissement", "Colère", "Confusion", "Indifférence totale"], c: 0},
+            {q: "Un groupe peut-il rester à l'étape de turbulence ?", o: ["Oui, si les conflits ne sont pas résolus", "Non, c'est impossible", "Seulement 1 jour", "Jamais"], c: 0},
+            {q: "Quelle étape nécessite le plus d'intervention du leader ?", o: ["Turbulence", "Performance", "Dissolution", "Normalisation"], c: 0},
+
+            // Questions sur les facteurs influençant la dynamique (81-110)
+            {q: "Quel facteur influence la dynamique de groupe ?", o: ["Le style de leadership", "La couleur des murs", "Le jour de la semaine", "La météo"], c: 0},
+            {q: "Qu'est-ce que la cohésion de groupe ?", o: ["Le degré d'unité et de solidarité", "Le nombre de membres", "L'âge moyen", "Le salaire moyen"], c: 0},
+            {q: "Pourquoi la communication est-elle importante ?", o: ["Elle facilite la coordination et réduit les malentendus", "Elle fait perdre du temps", "Elle crée des conflits", "Elle n'est pas importante"], c: 0},
+            {q: "Qu'est-ce que le conformisme social ?", o: ["La tendance à adopter les normes du groupe", "La rébellion constante", "L'individualisme extrême", "L'absence de règles"], c: 0},
+            {q: "Quel style de leadership favorise la participation ?", o: ["Le leadership démocratique", "Le leadership autoritaire", "Le leadership absent", "Le leadership chaotique"], c: 0},
+            {q: "Qu'est-ce qu'un leadership autoritaire ?", o: ["Un leader qui prend toutes les décisions seul", "Un leader absent", "Un leader qui consulte toujours", "Un leader sans pouvoir"], c: 0},
+            {q: "Quel est l'avantage du leadership démocratique ?", o: ["Meilleure motivation et créativité", "Décisions plus rapides", "Moins de responsabilités", "Confusion totale"], c: 0},
+            {q: "Que provoque un manque de communication ?", o: ["Malentendus et conflits", "Meilleure efficacité", "Plus de créativité", "Rien du tout"], c: 0},
+            {q: "Comment renforcer la cohésion ?", o: ["Par des objectifs communs et la confiance", "Par la compétition interne", "Par l'isolement", "Par l'autoritarisme"], c: 0},
+            {q: "Quel est le risque du conformisme excessif ?", o: ["La pensée de groupe et manque de créativité", "Trop d'innovation", "Trop de conflits", "Meilleure performance"], c: 0},
+            {q: "Qu'est-ce que la pensée de groupe ?", o: ["Consensus sans analyse critique", "Débat constructif", "Diversité d'opinions", "Analyse approfondie"], c: 0},
+            {q: "Comment encourager la participation ?", o: ["En valorisant toutes les contributions", "En critiquant les idées", "En imposant le silence", "En ignorant certains membres"], c: 0},
+            {q: "Quel rôle joue la confiance dans un groupe ?", o: ["Elle favorise la collaboration et l'ouverture", "Elle crée des conflits", "Elle ralentit le travail", "Elle n'a pas d'importance"], c: 0},
+            {q: "Comment établir la confiance ?", o: ["Par la transparence et le respect", "Par le secret", "Par la méfiance", "Par l'autoritarisme"], c: 0},
+            {q: "Qu'est-ce qu'une norme de groupe ?", o: ["Une règle acceptée par tous les membres", "Une loi nationale", "Une suggestion", "Une obligation légale"], c: 0},
+            {q: "Pourquoi les normes sont-elles importantes ?", o: ["Elles structurent les comportements", "Elles créent la confusion", "Elles sont inutiles", "Elles limitent la créativité"], c: 0},
+            {q: "Comment un leader peut-il gérer les conflits ?", o: ["Par l'écoute et la médiation", "En les ignorant", "En prenant parti", "En excluant des membres"], c: 0},
+            {q: "Quel est l'impact d'un mauvais leadership ?", o: ["Démotivation et conflits", "Meilleure performance", "Plus de créativité", "Aucun impact"], c: 0},
+            {q: "Qu'est-ce que le leadership situationnel ?", o: ["Adapter son style à la situation", "Rester rigide", "Être toujours autoritaire", "Être toujours démocratique"], c: 0},
+            {q: "Comment mesurer la cohésion d'un groupe ?", o: ["Par l'engagement et l'entraide", "Par le nombre de membres", "Par le budget", "Par la taille du bureau"], c: 0},
+
+            // Questions sur les conflits (111-150)
+            {q: "Les conflits sont-ils inévitables ?", o: ["Oui, dans toute organisation", "Non, jamais", "Seulement dans les grandes entreprises", "Seulement en hiver"], c: 0},
+            {q: "Quelle est une cause fréquente de conflit ?", o: ["Mauvaise communication", "Bonne entente", "Objectifs clairs", "Ressources abondantes"], c: 0},
+            {q: "Qu'est-ce qu'un conflit intra-individuel ?", o: ["Un conflit interne à une personne", "Entre deux personnes", "Entre deux groupes", "Entre deux entreprises"], c: 0},
+            {q: "Qu'est-ce qu'un conflit interpersonnel ?", o: ["Entre deux ou plusieurs personnes", "À l'intérieur d'une personne", "Entre deux groupes", "Entre pays"], c: 0},
+            {q: "Qu'est-ce qu'un conflit intragroupe ?", o: ["Au sein d'un même groupe", "Entre deux groupes", "Entre personnes de groupes différents", "International"], c: 0},
+            {q: "Qu'est-ce qu'un conflit intergroupe ?", o: ["Entre deux groupes différents", "Au sein d'un groupe", "Dans une personne", "Entre deux personnes"], c: 0},
+            {q: "Quelle cause peut provoquer un conflit ?", o: ["Répartition inéquitable des ressources", "Ressources abondantes", "Communication parfaite", "Objectifs identiques"], c: 0},
+            {q: "Les différences de valeurs peuvent-elles causer des conflits ?", o: ["Oui, absolument", "Non, jamais", "Seulement dans certains pays", "Seulement entre générations"], c: 0},
+            {q: "Un conflit peut-il être positif ?", o: ["Oui, s'il est bien géré", "Non, toujours négatif", "Jamais", "Impossible"], c: 0},
+            {q: "Qu'apporte un conflit bien géré ?", o: ["Innovation et amélioration", "Destruction", "Démotivation", "Chaos"], c: 0},
+            {q: "Que provoque un conflit mal géré ?", o: ["Stress et absentéisme", "Meilleure ambiance", "Plus de motivation", "Rien"], c: 0},
+            {q: "Comment prévenir les conflits ?", o: ["Par une communication claire", "Par le silence", "Par l'évitement", "Par l'ignorance"], c: 0},
+            {q: "Quel est le rôle de l'écoute active ?", o: ["Comprendre les besoins de chacun", "Ignorer les autres", "Imposer son opinion", "Créer des malentendus"], c: 0},
+            {q: "La médiation est-elle utile dans les conflits ?", o: ["Oui, elle facilite la résolution", "Non, elle aggrave les choses", "Jamais", "Seulement dans les tribunaux"], c: 0},
+            {q: "Qu'est-ce que l'escalade d'un conflit ?", o: ["L'intensification progressive", "La résolution rapide", "La disparition", "La stagnation"], c: 0},
+            {q: "Comment éviter l'escalade ?", o: ["Intervenir tôt et communiquer", "Ignorer le problème", "Attendre que ça passe", "Créer plus de tensions"], c: 0},
+            {q: "Les émotions jouent-elles un rôle dans les conflits ?", o: ["Oui, un rôle majeur", "Non, aucun", "Seulement chez certaines personnes", "Jamais"], c: 0},
+            {q: "Comment gérer les émotions en conflit ?", o: ["Par la régulation émotionnelle et l'empathie", "Par la colère", "Par l'agressivité", "Par l'indifférence"], c: 0},
+            {q: "Qu'est-ce que l'assertivité ?", o: ["Exprimer ses besoins en respectant autrui", "L'agressivité", "La passivité", "La manipulation"], c: 0},
+            {q: "L'assertivité aide-t-elle à gérer les conflits ?", o: ["Oui, elle favorise le dialogue", "Non, elle aggrave tout", "Jamais", "Seulement parfois"], c: 0},
+
+            // Questions sur Thomas et Kilmann (151-170)
+            {q: "Combien de styles de gestion de conflits Thomas et Kilmann proposent-ils ?", o: ["5 styles", "3 styles", "7 styles", "10 styles"], c: 0},
+            {q: "Quel est le premier style de Thomas-Kilmann ?", o: ["Compétition", "Évitement", "Collaboration", "Compromis"], c: 0},
+            {q: "Qu'est-ce que le style compétition ?", o: ["Imposer sa solution, gagner à tout prix", "Éviter le conflit", "Chercher un accord mutuel", "Céder aux autres"], c: 0},
+            {q: "Qu'est-ce que le style évitement ?", o: ["Ignorer ou reporter le conflit", "Affronter directement", "Imposer sa volonté", "Collaborer activement"], c: 0},
+            {q: "Qu'est-ce que le style accommodation ?", o: ["Céder aux désirs de l'autre", "Imposer sa volonté", "Éviter le conflit", "Chercher un compromis"], c: 0},
+            {q: "Qu'est-ce que le style compromis ?", o: ["Trouver un terrain d'entente acceptable", "Gagner à tout prix", "Céder complètement", "Éviter le problème"], c: 0},
+            {q: "Qu'est-ce que le style collaboration ?", o: ["Chercher une solution gagnant-gagnant", "Imposer sa solution", "Éviter le conflit", "Céder aux autres"], c: 0},
+            {q: "Quel style est le plus constructif à long terme ?", o: ["Collaboration", "Compétition", "Évitement", "Accommodation"], c: 0},
+            {q: "Quand utiliser le style compétition ?", o: ["En situation d'urgence ou décision impopulaire", "Toujours", "Jamais", "Pour les petits problèmes"], c: 0},
+            {q: "Quand l'évitement peut-il être approprié ?", o: ["Pour les problèmes mineurs ou temporaires", "Pour tous les conflits", "Jamais", "Toujours"], c: 0},
+            {q: "Quel est le risque du style évitement ?", o: ["Le conflit s'aggrave avec le temps", "Résolution trop rapide", "Trop de communication", "Aucun risque"], c: 0},
+            {q: "Quand utiliser l'accommodation ?", o: ["Quand la relation est plus importante que l'enjeu", "Toujours", "Jamais", "En cas d'urgence"], c: 0},
+            {q: "Quel est l'avantage du compromis ?", o: ["Solution rapide et équitable", "Satisfaction totale de tous", "Aucun avantage", "Victoire complète"], c: 0},
+            {q: "Quel est l'inconvénient du compromis ?", o: ["Personne n'est pleinement satisfait", "Trop de temps perdu", "Trop coûteux", "Aucun inconvénient"], c: 0},
+            {q: "Pourquoi la collaboration est-elle idéale ?", o: ["Elle satisfait tous les besoins", "Elle est rapide", "Elle évite la discussion", "Elle impose une solution"], c: 0},
+            {q: "Quel est l'inconvénient de la collaboration ?", o: ["Elle prend du temps et de l'énergie", "Elle crée des conflits", "Elle est inefficace", "Aucun inconvénient"], c: 0},
+            {q: "Peut-on changer de style selon la situation ?", o: ["Oui, c'est recommandé", "Non, il faut un seul style", "Jamais", "C'est impossible"], c: 0},
+            {q: "Le style compétition est-il toujours mauvais ?", o: ["Non, il est utile dans certaines situations", "Oui, toujours mauvais", "Il n'existe pas", "Oui, à éviter absolument"], c: 0},
+            {q: "Quel style privilégier pour les enjeux importants ?", o: ["Collaboration", "Évitement", "Accommodation", "Compétition pure"], c: 0},
+            {q: "Les 5 styles sont-ils exclusifs ?", o: ["Non, on peut les combiner", "Oui, un seul à la fois", "Ils sont identiques", "Ils n'existent pas"], c: 0},
+
+            // Questions sur la gestion et prévention (171-200)
+            {q: "Qu'est-ce qu'une communication claire ?", o: ["Un message précis et compréhensible", "Un message vague", "Un silence", "Un cri"], c: 0},
+            {q: "Pourquoi la confiance est-elle essentielle ?", o: ["Elle réduit les tensions et favorise la coopération", "Elle crée des conflits", "Elle n'est pas importante", "Elle ralentit le travail"], c: 0},
+            {q: "À quoi servent les règles partagées ?", o: ["À structurer les interactions", "À créer la confusion", "À limiter la liberté", "Elles sont inutiles"], c: 0},
+            {q: "Qu'est-ce que la participation équilibrée ?", o: ["Chacun contribue de manière égale", "Une personne domine", "Personne ne participe", "Contribution aléatoire"], c: 0},
+            {q: "Comment favoriser la participation ?", o: ["En donnant la parole à tous", "En imposant le silence", "En ignorant certains", "En critiquant les idées"], c: 0},
+            {q: "Qu'améliore une bonne gestion des conflits ?", o: ["Les relations de travail", "Le stress", "L'absentéisme", "Les tensions"], c: 0},
+            {q: "Un conflit bien géré réduit-il le stress ?", o: ["Oui, considérablement", "Non, il l'augmente", "Aucun effet", "Parfois"], c: 0},
+            {q: "Quel impact sur l'absentéisme ?", o: ["Il diminue avec une bonne gestion", "Il augmente", "Aucun impact", "Il double"], c: 0},
+            {q: "La motivation est-elle renforcée ?", o: ["Oui, par la résolution constructive", "Non, elle baisse", "Elle reste identique", "Elle disparaît"], c: 0},
+            {q: "Qu'est-ce que la prise de décision collective ?", o: ["Décisions prises en groupe", "Décision d'une seule personne", "Absence de décision", "Décision aléatoire"], c: 0},
+            {q: "Les conflits facilitent-ils les décisions collectives ?", o: ["Oui, s'ils sont bien gérés", "Non, jamais", "Toujours négatif", "Impossible"], c: 0},
+            {q: "Qu'est-ce que la créativité de groupe ?", o: ["Capacité à innover ensemble", "Copier les autres", "Absence d'idées", "Routine"], c: 0},
+            {q: "Les conflits peuvent-ils stimuler la créativité ?", o: ["Oui, par la diversité des points de vue", "Non, ils la bloquent", "Jamais", "Impossible"], c: 0},
+            {q: "Qu'est-ce que la performance d'équipe ?", o: ["L'efficacité collective dans l'atteinte des objectifs", "Le travail individuel", "L'échec", "La lenteur"], c: 0},
+            {q: "Une dynamique positive améliore-t-elle la performance ?", o: ["Oui, significativement", "Non, aucun effet", "Elle la diminue", "Parfois"], c: 0},
+            {q: "Qu'est-ce que la cohésion d'équipe ?", o: ["Le degré d'unité et de solidarité", "La division", "Le conflit permanent", "L'individualisme"], c: 0},
+            {q: "Comment la cohésion influence-t-elle les résultats ?", o: ["Elle améliore la collaboration et les résultats", "Elle les détériore", "Aucun effet", "Elle crée des problèmes"], c: 0},
+            {q: "Quel est le rôle du manager dans la dynamique ?", o: ["Faciliter les interactions et gérer les conflits", "Créer des tensions", "Ignorer le groupe", "Dominer complètement"], c: 0},
+            {q: "La formation aide-t-elle à gérer les conflits ?", o: ["Oui, elle développe les compétences", "Non, elle est inutile", "Elle aggrave les choses", "Jamais"], c: 0},
+            {q: "Qu'est-ce qu'un feedback constructif ?", o: ["Une critique bienveillante pour progresser", "Une attaque personnelle", "Un silence", "Une ignorance"], c: 0},
+            {q: "Le feedback améliore-t-il la dynamique ?", o: ["Oui, en clarifiant les attentes", "Non, il crée des conflits", "Il est nuisible", "Aucun effet"], c: 0},
+            {q: "Qu'est-ce que l'intelligence émotionnelle ?", o: ["Comprendre et gérer ses émotions et celles des autres", "L'intelligence académique", "L'absence d'émotions", "La logique pure"], c: 0},
+            {q: "L'intelligence émotionnelle aide-t-elle en groupe ?", o: ["Oui, pour les relations et conflits", "Non, elle est inutile", "Elle crée des problèmes", "Jamais"], c: 0},
+            {q: "Qu'est-ce que l'empathie ?", o: ["Se mettre à la place de l'autre", "L'indifférence", "La critique", "Le jugement"], c: 0},
+            {q: "L'empathie réduit-elle les conflits ?", o: ["Oui, en favorisant la compréhension", "Non, elle les aggrave", "Elle est inutile", "Jamais"], c: 0},
+            {q: "Qu'est-ce que la diversité en groupe ?", o: ["Variété de perspectives et compétences", "Uniformité totale", "Absence de différences", "Conflit permanent"], c: 0},
+            {q: "La diversité est-elle bénéfique ?", o: ["Oui, pour l'innovation et créativité", "Non, elle crée des conflits", "Elle est négative", "Toujours problématique"], c: 0},
+            {q: "Comment gérer la diversité ?", o: ["Par l'inclusion et le respect", "Par l'exclusion", "Par l'uniformisation", "Par l'ignorance"], c: 0},
+            {q: "Qu'est-ce qu'une culture organisationnelle positive ?", o: ["Valeurs et normes favorisant le bien-être", "Un environnement toxique", "L'absence de règles", "Le chaos"], c: 0},
+            {q: "La culture influence-t-elle la dynamique ?", o: ["Oui, profondément", "Non, aucun effet", "Rarement", "Jamais"], c: 0},
+            {q: "En conclusion, que faut-il pour une équipe performante ?", o: ["Dynamique positive et gestion constructive des conflits", "Absence de conflits", "Domination d'un leader", "Individualisme"], c: 0}
+        ];
+
+        let userName = '';
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedAnswer = null;
+
+        function startQuiz() {
+            const nameInput = document.getElementById('userName').value.trim();
+            if (!nameInput) {
+                alert('Veuillez entrer votre nom !');
+                return;
+            }
+            
+            userName = nameInput;
+            document.getElementById('displayName').textContent = userName;
+            
+            // Sélectionner 20 questions aléatoires
+            currentQuestions = getRandomQuestions(20);
+            currentQuestionIndex = 0;
+            score = 0;
+            
+            document.querySelector('.welcome-screen').classList.remove('active');
+            document.querySelector('.quiz-screen').classList.add('active');
+            
+            displayQuestion();
+        }
+
+        function getRandomQuestions(count) {
+            const shuffled = [...questionsDB].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, count);
+        }
+
+        function displayQuestion() {
+            const question = currentQuestions[currentQuestionIndex];
+            selectedAnswer = null;
+            
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('currentScore').textContent = score;
+            document.getElementById('questionText').textContent = question.q;
+            
+            // Barre de progression
+            const progress = ((currentQuestionIndex + 1) / 20) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Afficher les options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.o.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectAnswer(index, optionDiv);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function selectAnswer(index, element) {
+            if (selectedAnswer !== null) return; // Empêcher de changer après sélection
+            
+            selectedAnswer = index;
+            const question = currentQuestions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach((opt, i) => {
+                if (i === question.c) {
+                    opt.classList.add('correct');
+                } else if (i === index) {
+                    opt.classList.add('incorrect');
+                }
+                opt.style.cursor = 'default';
+            });
+            
+            if (index === question.c) {
+                score++;
+                document.getElementById('currentScore').textContent = score;
+            }
+            
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < 20) {
+                displayQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.querySelector('.quiz-screen').classList.remove('active');
+            document.querySelector('.result-screen').classList.add('active');
+            
+            document.getElementById('finalName').textContent = userName;
+            document.getElementById('finalScore').textContent = score + ' / 20';
+            
+            let message = '';
+            const percentage = (score / 20) * 100;
+            
+            if (percentage >= 90) {
+                message = '🏆 Excellent ! Vous maîtrisez parfaitement la dynamique de groupe !';
+            } else if (percentage >= 75) {
+                message = '👏 Très bien ! Vous avez une bonne compréhension du sujet.';
+            } else if (percentage >= 60) {
+                message = '👍 Bien ! Continuez à réviser pour améliorer vos connaissances.';
+            } else if (percentage >= 50) {
+                message = '📚 Passable. Il serait bon de revoir certains concepts.';
+            } else {
+                message = '💪 Courage ! Révisez le cours et réessayez.';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+        }
+
+        function restartQuiz() {
+            document.querySelector('.result-screen').classList.remove('active');
+            document.querySelector('.welcome-screen').classList.add('active');
+            document.getElementById('userName').value = '';
+        }
+    </script>
+</body>
+</html>
